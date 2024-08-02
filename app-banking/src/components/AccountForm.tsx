@@ -1,4 +1,3 @@
-// AccountForm.tsx
 import React, { useState } from 'react';
 import { useMutation } from 'react-query';
 import { useDispatch } from 'react-redux';

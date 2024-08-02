@@ -1,4 +1,3 @@
-// TransactionForm.tsx
 import React, { useState } from 'react';
 import { useMutation } from 'react-query';
 import { useDispatch, useSelector } from 'react-redux';
@@ -7,59 +6,68 @@ import { depositMock, withdrawMock } from '../mocks/mockApi';
 import { RootState } from '../store/store';
 
 const TransactionForm: React.FC = () => {
-  const [amount, setAmount] = useState(0);
+  const [amount, setAmount] = useState<string>('');
   const [type, setType] = useState('deposit');
   const dispatch = useDispatch();
-  const account = useSelector((state: RootState) => state.account);
+  const { name, accountNumber } = useSelector((state: RootState) => state.account);
 
-  // React Query mutations to simulate backend calls for deposits and withdrawals
+  const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value.replace(/[^0-9]/g, ''); // Remove non-numeric characters
+    setAmount(value);
+  };
+
   const depositMutation = useMutation(depositMock, {
     onSuccess: (data) => {
-      // Update Redux state with the simulated backend response
-      dispatch(deposit(data.balance));
+      dispatch(deposit(Number(amount)));
     },
   });
 
   const withdrawMutation = useMutation(withdrawMock, {
     onSuccess: (data) => {
-      // Update Redux state with the simulated backend response
-      dispatch(withdraw(data.balance));
+      dispatch(withdraw(Number(amount)));
     },
   });
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    const numericAmount = Number(amount); // Convert amount to number
     if (type === 'deposit') {
-      depositMutation.mutate(amount); // Trigger the simulated backend call for deposit
+      depositMutation.mutate(numericAmount);
     } else {
-      withdrawMutation.mutate(amount); // Trigger the simulated backend call for withdrawal
+      withdrawMutation.mutate(numericAmount);
     }
+    setAmount(''); // Clear the input after submission
   };
+
+  // Check if the account has been created
+  const isAccountCreated = name !== '' && accountNumber !== '';
 
   return (
     <form onSubmit={handleSubmit}>
       <div>
         <label>Amount:</label>
         <input
-          type="number"
+          type="text"
+          placeholder="$"
           value={amount}
-          onChange={(e) => setAmount(Number(e.target.value))}
+          onChange={handleAmountChange}
           required
-          disabled={!account.name || !account.accountNumber}
+          disabled={!isAccountCreated} // Disable input if account not created
         />
       </div>
       <div>
         <label>Type:</label>
-        <select
-          value={type}
-          onChange={(e) => setType(e.target.value)}
-          disabled={!account.name || !account.accountNumber}
-        >
+        <select value={type} onChange={(e) => setType(e.target.value)} disabled={!isAccountCreated}>
           <option value="deposit">Deposit</option>
           <option value="withdraw">Withdraw</option>
         </select>
       </div>
-      <button type="submit" disabled={!account.name || !account.accountNumber}>Submit</button>
+      <button type="submit" disabled={!isAccountCreated}>
+        Submit
+      </button>
+      {!isAccountCreated && (
+        <p style={{ color: 'red' }}>You must create an account before making transactions.</p>
+      )}
     </form>
   );
 };
