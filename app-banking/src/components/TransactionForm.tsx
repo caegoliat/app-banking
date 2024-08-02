@@ -12,7 +12,7 @@ const TransactionForm: React.FC = () => {
   const { name, accountNumber } = useSelector((state: RootState) => state.account);
 
   const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value.replace(/[^0-9]/g, ''); // Remove non-numeric characters
+    const value = e.target.value.replace(/[^0-9]/g, ''); 
     setAmount(value);
   };
 
@@ -30,16 +30,15 @@ const TransactionForm: React.FC = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    const numericAmount = Number(amount); // Convert amount to number
+    const numericAmount = Number(amount); 
     if (type === 'deposit') {
       depositMutation.mutate(numericAmount);
     } else {
       withdrawMutation.mutate(numericAmount);
     }
-    setAmount(''); // Clear the input after submission
+    setAmount(''); 
   };
 
-  // Check if the account has been created
   const isAccountCreated = name !== '' && accountNumber !== '';
 
   return (
@@ -52,7 +51,7 @@ const TransactionForm: React.FC = () => {
           value={amount}
           onChange={handleAmountChange}
           required
-          disabled={!isAccountCreated} // Disable input if account not created
+          disabled={!isAccountCreated}
         />
       </div>
       <div>

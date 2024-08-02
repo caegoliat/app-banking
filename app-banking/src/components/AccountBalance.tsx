@@ -1,4 +1,3 @@
-// AccountBalance.tsx
 import React, { useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useQuery } from 'react-query';
